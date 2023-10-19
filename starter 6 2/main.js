@@ -17,7 +17,7 @@ const fs = require("fs").promises
 
 IOhandler.unzip(zipFilePath, pathUnzipped)
   .then(() => fs.mkdir(pathProcessed))
-  .then(IOhandler.readDir(pathUnzipped))
+  .then(() => IOhandler.readDir(pathUnzipped))
   .then((image) => IOhandler.grayScale(image, pathProcessed))
   .catch(err => console.error(err))
 

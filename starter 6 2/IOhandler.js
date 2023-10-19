@@ -8,9 +8,10 @@
  *
  */
 
-const unzipper = require("unzipper"),
+//const unzipper = require("unzipper"),
+const AdmZip = require("adm-zip"),
   fs = require("fs").promises,
-  {createReadStream, createWriteStream, readFiles} = require("fs"),
+  {createReadStream, createWriteStream, readFiles, existsSync } = require("fs"),
   PNG = require("pngjs").PNG,
   path = require("path");
 
@@ -23,10 +24,18 @@ const unzipper = require("unzipper"),
  */
 
 const unzip = (pathIn, pathOut) => {
-  createReadStream(pathIn)
-    .pipe(unzipper.Extract({path: pathOut}))
-    .promise()
-    .then( () => console.log('Extraction operation complete'), e => console.log('error', e))
+  // createReadStream(pathIn)
+  //   .pipe(unzipper.Extract({path: pathOut}))
+  //   .promise()
+  //   .then( () => console.log('Extraction operation complete'), e => console.log('error', e))
+  return new Promise((res, rej) => {
+    const zip = new AdmZip(pathIn)
+    zip.extractAllTo(pathOut, true)
+    if (existsSync(pathOut))
+      res(console.log('Extraction operation complete'))
+    else
+      rej(console.log('error'))
+  })
 };
 
 /**
@@ -52,6 +61,7 @@ const readDir = (dir) => {
       })
   })
 }
+
 /**
  * Description: Read in png file by given pathIn,
  * convert to grayscale and write to given pathOut
@@ -86,7 +96,10 @@ module.exports = {
   grayScale,
 };
 
-unzip("myfile.zip", "unzipped")
-  .then(() => readDir("unzipped"))
-  .then((images) => grayScale(images, "imageGrey"))
-  .catch(err => console.error(err))
+const pathIn = "myfile.zip"
+
+// unzip(pathIn, "unzipped")
+//   .then(() => fs.mkdir("imageGrey"))
+//   .then(() => readDir("unzipped"))
+//   .then((images) => grayScale(images, "imageGrey"))
+//   .catch(err => console.error(err))
